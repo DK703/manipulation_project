@@ -57,6 +57,8 @@ public:
                 "Initializing Node: get_object_pose_action_client...");
 
 
+
+
     // initialize action client
     this->action_client_ = rclcpp_action::create_client<FindGraspableObjects>(
         this->get_node_base_interface(), this->get_node_graph_interface(),
@@ -118,10 +120,10 @@ public:
       // do nothing
     }
 
-
+    
     // check if action server is ready
     if (!this->action_client_->wait_for_action_server(
-            std::chrono::seconds(10))) {
+            std::chrono::seconds(30))) {
       RCLCPP_ERROR(this->get_logger(),
                    "Action Server Unavailable. Waiting Timed Out.");
       this->goal_done_ = true;
@@ -131,7 +133,7 @@ public:
                   action_name_.c_str());
     }
 
-
+    
     RCLCPP_INFO(this->get_logger(), "Sending Action Goal...");
 
 
@@ -449,12 +451,21 @@ public:
 
 
     RCLCPP_INFO(LOGGER, "Closing Gripper...");
-    setup_joint_value_gripper(+0.648);
+    setup_joint_value_gripper(+0.64);
     plan_trajectory_gripper();
     execute_trajectory_gripper();
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));   
     RCLCPP_INFO(LOGGER, "Gripper Closed");
 
+     for (int i = 1; i <= 4; i++)
+     {
+        setup_joint_value_gripper(+0.647);
+        plan_trajectory_gripper();
+        execute_trajectory_gripper();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));   
+     }
+        
+     
 
     RCLCPP_INFO(LOGGER, "Retreating...");
     // setup the cartesian target
@@ -475,7 +486,7 @@ public:
     // setup the joint value target 1.5708
     RCLCPP_INFO(LOGGER, "Preparing Joint Value Trajectory...");
     setup_joint_value_target(
-        +2.3307, joint_group_positions_robot_[1],
+        +2.0607, joint_group_positions_robot_[1],
         joint_group_positions_robot_[2], joint_group_positions_robot_[3],
         joint_group_positions_robot_[4], joint_group_positions_robot_[5]);
     // plan and execute the trajectory
